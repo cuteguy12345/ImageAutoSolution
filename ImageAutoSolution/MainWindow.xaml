@@ -1,0 +1,134 @@
+﻿<Window x:Class="ImageAutoSolution.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ImageAutoSolution"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="760" Width="1280">
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="403"/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="77*"/>
+            <RowDefinition Height="12*"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Orientation="Vertical" Grid.Column="0" Grid.Row="0" Margin="15,10,0,10">
+            <StackPanel Orientation="Horizontal" Margin="0,5,0,5">
+                <Label Content="시작:" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                <DatePicker SelectedDate="{Binding StartDate}" HorizontalAlignment="Left" Width="156" Margin="0,0,10,0"/>
+                <ComboBox ItemsSource="{Binding Hours}" SelectedItem="{Binding StartHour}" Width="50" Margin="0,0,5,0"/>
+                <Label Content="시" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                <ComboBox ItemsSource="{Binding Minutes}" SelectedItem="{Binding StartMinute}" Width="50" Margin="0,0,5,0"/>
+                <Label Content="분" VerticalAlignment="Center" Margin="0,0,10,0"/>
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal" Margin="0,5,0,10">
+                <Label Content="종료:" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                <DatePicker SelectedDate="{Binding EndDate}" HorizontalAlignment="Left" Width="156" Margin="0,0,10,0"/>
+                <ComboBox ItemsSource="{Binding Hours}" SelectedItem="{Binding EndHour}" Width="50" Margin="0,0,5,0"/>
+                <Label Content="시" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                <ComboBox ItemsSource="{Binding Minutes}" SelectedItem="{Binding EndMinute}" Width="50" Margin="0,0,5,0"/>
+                <Label Content="분" VerticalAlignment="Center" Margin="0,0,10,0"/>
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal" Margin="0,5,0,10">
+                <Label Content="그룹:" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                <ComboBox ItemsSource="{Binding GroupNames}" SelectedItem="{Binding SelectedGroupName}" Width="156" Margin="0,0,10,0"/>
+                <CheckBox Content="미판독만 보기" IsChecked="{Binding GoodReadFilter}" VerticalAlignment="Center" Width="105"/>
+            </StackPanel>
+        </StackPanel>
+        
+
+        <DataGrid Name="imageDataGrid" Grid.Row="1" Grid.Column="0" Margin="10,2,10,10" ItemsSource="{Binding ImageData}" 
+          SelectionChanged="ImageDataGrid_SelectionChanged"
+          AutoGenerateColumns="False" 
+          SelectionMode="Single"
+          CanUserAddRows="False"
+          IsReadOnly="True" Background="White"
+            CanUserResizeColumns="False"
+                  >
+            <DataGrid.BorderBrush>
+                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                    <GradientStop Color="Black"/>
+                    <GradientStop Color="Black" Offset="1"/>
+                </LinearGradientBrush>
+            </DataGrid.BorderBrush>
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="날짜" Binding="{Binding CreateDT}" Width="150" />
+                <DataGridTextColumn Header="Trigger Index" Binding="{Binding Trigger_Index}" Width="85" />
+                <DataGridTextColumn Header="Group Name" Binding="{Binding GroupName}" Width="85" />
+                <DataGridTextColumn Header="판독" Binding="{Binding Good_Read}" Width="60" />
+                <!--<DataGridTextColumn Header="mac" Binding="{Binding MacAddress}" Width="60" />
+                <DataGridTextColumn Header="mac" Binding="{Binding Name}" Width="60" />-->
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="90,0,90,3">
+            <WrapPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                <Button Content="이전 페이지" Command="{Binding PreviousPageCommand}" Height="44" Margin="5,0" />
+                <TextBlock Text="{Binding CurrentPage}" VerticalAlignment="Center" Margin="5,0" />
+                <TextBlock Text=" / " VerticalAlignment="Center" Margin="5,0" />
+                <TextBlock Text="{Binding TotalPages}" VerticalAlignment="Center" Margin="5,0" />
+                <Button Content="다음 페이지" Command="{Binding NextPageCommand}" Height="44" Margin="5,0" />
+            </WrapPanel>
+        </StackPanel>
+
+
+
+        <TabControl Grid.Row="0" Margin="10,10,10,10" Grid.RowSpan="3" 
+            ItemsSource="{Binding TabControlHeaders}" SelectionChanged="TabControl_SelectionChanged" Grid.Column="1">
+            <TabControl.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding Name}" />
+                </DataTemplate>
+            </TabControl.ItemTemplate>
+            <TabControl.ContentTemplate>
+                <DataTemplate>
+                    <ScrollViewer>
+                        <ItemsControl ItemsSource="{Binding Images}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <WrapPanel Orientation="Horizontal" />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Image Source="{Binding}" Width="200" Height="200" Margin="5,5,5,5" 
+                                   MouseLeftButtonDown="Image_MouseLeftButtonDown" />
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+                </DataTemplate>
+            </TabControl.ContentTemplate>
+        </TabControl>
+
+        <Popup Name="ImagePopup" IsOpen="False" StaysOpen="False" Placement="Center" Grid.ColumnSpan="2" Margin="0,0,280,-256" Grid.RowSpan="3">
+            <Border BorderThickness="1">
+                <Image Name="PopupImage" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center"
+               MouseWheel="Image_MouseWheel"
+               MouseLeftButtonDown="PopupImage_MouseLeftButtonDown"
+               MouseMove="PopupImage_MouseMove"
+               MouseLeftButtonUp="PopupImage_MouseLeftButtonUp">
+                    <Image.RenderTransform>
+                        <TransformGroup>
+                            <ScaleTransform x:Name="PopupImageScaleTransform" ScaleX="1" ScaleY="1" />
+                            <TranslateTransform x:Name="PopupImageTranslateTransform" X="0" Y="0" />
+                        </TransformGroup>
+                    </Image.RenderTransform>
+                    <Image.RenderTransformOrigin>
+                        <Point X="1.0" Y="1.0" />
+                    </Image.RenderTransformOrigin>
+                </Image>
+            </Border>
+        </Popup>
+
+    </Grid>
+</Window>
